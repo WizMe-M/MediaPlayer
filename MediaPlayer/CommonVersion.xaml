@@ -1,0 +1,67 @@
+﻿<Window x:Class="MediaPlayer.CommonVersion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MediaPlayer"
+        mc:Ignorable="d"
+        Title="Common version 1.0" 
+        Height="900"
+        Width="1600"
+        WindowState="Maximized"
+        ResizeMode="NoResize">
+
+    <Grid Background="WhiteSmoke" Margin="5">
+        <!--TODO: Поменять стиль скролл вьюверу-->
+        <ScrollViewer 
+            HorizontalScrollBarVisibility="Visible"
+            VerticalScrollBarVisibility="Disabled"
+            CanContentScroll="True"
+            Height="190"
+            Width="1574"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top" 
+            Margin="10,10,0,0"
+            Padding="5">
+            <StackPanel 
+                Orientation="Horizontal">
+                <Button
+                    x:Name="BasicPlaylist"
+                    Width="140"
+                    Height="140">
+                    <Grid Width="130" Height="130">
+                        <TextBlock
+                            Text="Вся музыка"
+                            FontSize="14"
+                            FontFamily="Cambria"
+                            TextAlignment="Center" 
+                            Margin="10,114,10,0" 
+                            Foreground="Black"/>
+                        <Image
+                        Source="D:\Загрузки\playlist_icon.png" Margin="10,0,10,20"/>
+
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+        <MediaElement 
+            x:Name="MusicPlayer"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            LoadedBehavior="Manual"
+            Source="C:\Users\ender\Music\Breaking Benjamin - Red Cold River.mp3"
+            Height="30" 
+            Width="30"/>
+        <ToggleButton
+            x:Name="PlayButton"
+            Content="Play"
+            FontSize="32"
+            Height="100"
+            Width="100" 
+            Margin="769,704,715,57"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center" 
+            Click="PlayButton_Click"
+            />
+    </Grid>
+</Window>

@@ -1,0 +1,45 @@
+﻿<Window x:Class="MediaPlayer.DialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MediaPlayer"
+        mc:Ignorable="d"
+        Title="Версии" Height="350" Width="350">
+    
+    <Window.Resources>
+        <Style x:Key="DialogButtons" TargetType="Button">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="Width" Value="250"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="FontFamily" Value="Corbel"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Background="Azure" >
+        <TextBlock
+            Text="Выберите версию приложения:"
+            FontSize="20"
+            FontFamily="Tahoma"
+            Margin="25,35,0,0" 
+            HorizontalAlignment="Left" 
+            VerticalAlignment="Top"
+            Width="292" 
+            Height="34"/>
+        <Button
+            Content="Обычная версия приложения" 
+            Margin="46,102,0,0" 
+            Style="{StaticResource DialogButtons}"
+            Background="#FFA9E63E" 
+            Click="OpenCommonVersion_Click"/>
+        <Button 
+            Content="PRO-версия приложения" 
+            Margin="46,209,0,0" 
+            Style="{StaticResource DialogButtons}"
+            Background="#FFE4A827" Click="OpenProVersion_Click"/>
+
+    </Grid>
+</Window>
