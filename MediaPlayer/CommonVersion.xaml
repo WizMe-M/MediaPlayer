@@ -10,40 +10,49 @@
         Width="1600"
         WindowState="Maximized"
         ResizeMode="NoResize">
+    <Window.Resources>
+        <Style x:Key="PlaylistStyle" TargetType="Button">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Height" Value="150"/>
+            <Setter Property="Background" Value="Gainsboro"/>
+            <Setter Property="Grid.Width" Value="140"/>
+            <Setter Property="Grid.Height" Value="140"/>
+        </Style>
+    </Window.Resources>
 
-    <Grid Background="WhiteSmoke" Margin="5">
-        <!--TODO: Поменять стиль скролл вьюверу-->
-        <ScrollViewer 
-            HorizontalScrollBarVisibility="Visible"
-            VerticalScrollBarVisibility="Disabled"
-            CanContentScroll="True"
-            Height="190"
-            Width="1574"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top" 
-            Margin="10,10,0,0"
-            Padding="5">
-            <StackPanel 
-                Orientation="Horizontal">
-                <Button
-                    x:Name="BasicPlaylist"
-                    Width="140"
-                    Height="140">
-                    <Grid Width="130" Height="130">
-                        <TextBlock
-                            Text="Вся музыка"
-                            FontSize="14"
-                            FontFamily="Cambria"
-                            TextAlignment="Center" 
-                            Margin="10,114,10,0" 
-                            Foreground="Black"/>
-                        <Image
-                        Source="D:\Загрузки\playlist_icon.png" Margin="10,0,10,20"/>
+    <Grid Background="WhiteSmoke" Margin="5,7,5,3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
 
-                    </Grid>
-                </Button>
-            </StackPanel>
-        </ScrollViewer>
+        <StackPanel
+            Orientation="Horizontal"
+            CanHorizontallyScroll="True" 
+            Margin="10">
+
+            <Button
+                Style="{StaticResource PlaylistStyle}">
+                <Grid Width="130" Height="130">
+                    <TextBlock
+                        Text="Вся музыка"
+                        FontSize="16"
+                        FontFamily="Candara"
+                        TextAlignment="Center" 
+                        Margin="10,114,10,0" 
+                        Foreground="Black"/>
+
+                    <Image
+                        Source="D:\Загрузки\playlist_icon.png" 
+                        Margin="10,5,10,20"/>
+
+                </Grid>
+
+            </Button>
+        </StackPanel>
+
         <MediaElement 
             x:Name="MusicPlayer"
             HorizontalAlignment="Left"
@@ -52,16 +61,27 @@
             Source="C:\Users\ender\Music\Breaking Benjamin - Red Cold River.mp3"
             Height="30" 
             Width="30"/>
+
         <ToggleButton
             x:Name="PlayButton"
             Content="Play"
             FontSize="32"
             Height="100"
             Width="100" 
-            Margin="769,704,715,57"
+            Margin="769,39.5,0,57"
             HorizontalAlignment="Left"
             VerticalAlignment="Center" 
             Click="PlayButton_Click"
+            Grid.Row="2"/>
+
+        <ListBox 
+            x:Name="CurrentPlaylist"
+            Margin="10,10,0,0" 
+            Grid.Row="1" 
+            VerticalAlignment="Top" 
+            HorizontalAlignment="Left" 
+            Height="459" 
+            Width="1564"
             />
     </Grid>
 </Window>
