@@ -19,6 +19,14 @@
             <Setter Property="Grid.Width" Value="140"/>
             <Setter Property="Grid.Height" Value="140"/>
         </Style>
+
+        <Style x:Key="ButtonStyle"  TargetType="Button">
+            <Setter Property="Background" Value="Wheat"/>
+        </Style>
+        
+        <Style x:Key="ToggleButtonStyle"  TargetType="ToggleButton">
+            <Setter Property="Background" Value="Wheat"/>
+        </Style>
     </Window.Resources>
 
     <Grid Background="WhiteSmoke" Margin="5,7,5,3">
@@ -64,15 +72,28 @@
 
         <ToggleButton
             x:Name="PlayButton"
+            Style="{StaticResource ToggleButtonStyle}"
+            IsThreeState="False"
             Content="Play"
             FontSize="32"
             Height="100"
             Width="100" 
-            Margin="769,39.5,0,57"
+            Margin="769,37,0,55"
             HorizontalAlignment="Left"
             VerticalAlignment="Center" 
             Click="PlayButton_Click"
             Grid.Row="2"/>
+
+        <Button
+            x:Name="NextButton"
+            Style="{StaticResource ButtonStyle}"
+            Content="Next"
+            FontSize="32"
+            Height="100"
+            Width="100"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Grid.Row="2" Margin="945,0,0,55" Click="NextButton_Click"/>
 
         <ListBox 
             x:Name="CurrentPlaylist"
@@ -81,7 +102,19 @@
             VerticalAlignment="Top" 
             HorizontalAlignment="Left" 
             Height="459" 
-            Width="1564"
+            Width="1564" 
+            Focusable="False"
+            SelectionChanged="CurrentPlaylist_SelectionChanged"
             />
+        <Button
+            x:Name="PreviousButton"     
+            Style="{StaticResource ButtonStyle}"       
+            Content="Previous"
+            FontSize="32"
+            Height="100"
+            Width="100"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Grid.Row="2" Margin="588,0,0,55" Click="PreviousButton_Click"/>
     </Grid>
 </Window>

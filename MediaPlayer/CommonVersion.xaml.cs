@@ -12,7 +12,8 @@ namespace MediaPlayer
     {
         List<Playlist> Playlists;
         FileSystemWatcher MusicWatcher;
-
+        int choosenPlaylist;
+        int previousMusicSelectedIndex = 0;
         public CommonVersion()
         {
             #region initialization
@@ -47,22 +48,42 @@ namespace MediaPlayer
             }
             #endregion
 
-
-            FillCurrentPlaylist(Playlists[0]);
+            //по умолчнию заполняем листбокс плейлистом со всей музыкой
+            FillCurrentPlaylist(Playlists, 0);
         }
 
         #region Mediaplayer's buttons
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            MusicPlayer.LoadedBehavior = (bool)PlayButton.IsChecked ? MediaState.Play : MediaState.Pause;
+            if ((bool)PlayButton.IsChecked)
+                MusicPlayer.Play();
+            else MusicPlayer.Pause();
+        }
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            previousMusicSelectedIndex++;
+            if (previousMusicSelectedIndex == CurrentPlaylist.Items.Count)
+                previousMusicSelectedIndex = 0;
+            MusicPlayer.Source = new System.Uri(Playlists[choosenPlaylist].Music[previousMusicSelectedIndex].Path);
+            MusicPlayer.Play();
+            PlayButton.IsChecked = true;
+        }
+        private void PreviousButton_Click(object sender, RoutedEventArgs e)
+        {
+            previousMusicSelectedIndex--;
+            if (previousMusicSelectedIndex == -1)
+                previousMusicSelectedIndex = CurrentPlaylist.Items.Count - 1;
+            MusicPlayer.Source = new System.Uri(Playlists[choosenPlaylist].Music[previousMusicSelectedIndex].Path);
+            MusicPlayer.Play();
+            PlayButton.IsChecked = true;
         }
         #endregion
 
         #region Playlists' functions
-        private void FillCurrentPlaylist(Playlist playlist)
+        void FillCurrentPlaylist(List<Playlist> playlists, int i)
         {
-            CurrentPlaylist.Tag = playlist.Name;
-            foreach (Music music in playlist.Music)
+            CurrentPlaylist.Tag = playlists[i].Name;
+            foreach (Music music in playlists[i].Music)
             {
                 var panel = new StackPanel
                 {
@@ -91,7 +112,45 @@ namespace MediaPlayer
 
                 CurrentPlaylist.Items.Add(panel);
             }
+            choosenPlaylist = i;
         }
+
+        private void PlaylistButton_Click(object sender, RoutedEventArgs eventArgs)
+        {
+            var panel = (sender as Button).Content as StackPanel;
+            var name = (panel.Children[1] as TextBlock).Text;
+            int index = Playlists.FindIndex(p => p.Name == name);
+            FillCurrentPlaylist(Playlists, index);
+        }
+        private void CurrentPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index;
+            if ((sender as ListBox).SelectedItem != null)
+            {
+                index = (sender as ListBox).SelectedIndex;
+                if (index == previousMusicSelectedIndex)
+                {
+                    if ((bool)PlayButton.IsChecked)
+                        MusicPlayer.Pause();
+                    else MusicPlayer.Play();
+                    PlayButton.IsChecked = !(bool)PlayButton.IsChecked;
+                }
+                else
+                {
+                    MusicPlayer.Source = new System.Uri(Playlists[choosenPlaylist].Music[index].Path);
+                    MusicPlayer.Play();
+                    PlayButton.IsChecked = true;
+                    previousMusicSelectedIndex = index;
+                }
+                //снимает выделение после нажатия
+                (sender as ListBox).SelectedItem = null;
+            }
+
+
+        }
+
+
         #endregion
+
     }
 }
