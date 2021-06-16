@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MediaPlayer"
-             StartupUri="DialogWindow.xaml">
+             StartupUri="CommonVersion.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="ResourceDictionary.xaml" x:Name="MyStyles"/>
     </Application.Resources>
 </Application>

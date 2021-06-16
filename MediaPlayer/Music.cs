@@ -16,7 +16,6 @@ namespace MediaPlayer
     class Music
     {
         public string Path { get; set; }
-        public Mp3 MP3 { get; set; }
         public Image AlbumCover { get; set; }
         public Id3Tag Tag { get; set; }
         Music()
@@ -26,7 +25,7 @@ namespace MediaPlayer
         public Music(string Path)
         {
             this.Path = Path;
-            MP3 = new Mp3(Path);
+            var MP3 = new Mp3(Path);
             Tag = MP3.GetTag(Id3TagFamily.Version2X);
             var audio = new TagLib.Mpeg.AudioFile(Path);
             AlbumCover = new Image

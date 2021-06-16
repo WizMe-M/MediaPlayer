@@ -10,65 +10,41 @@
         Width="1600"
         WindowState="Maximized"
         ResizeMode="NoResize">
-    <Window.Resources>
-        <Style x:Key="PlaylistStyle" TargetType="Button">
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="150"/>
-            <Setter Property="Background" Value="Gainsboro"/>
-            <Setter Property="Grid.Width" Value="140"/>
-            <Setter Property="Grid.Height" Value="140"/>
-        </Style>
-
-        <Style x:Key="ButtonStyle"  TargetType="Button">
-            <Setter Property="Background" Value="Wheat"/>
-        </Style>
-        
-        <Style x:Key="ToggleButtonStyle"  TargetType="ToggleButton">
-            <Setter Property="Background" Value="Wheat"/>
-        </Style>
-    </Window.Resources>
 
     <Grid Background="WhiteSmoke" Margin="5,7,5,3">
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="250*"/>
+            <RowDefinition Height="420*"/>
+            <RowDefinition Height="200*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel
+        <ScrollViewer 
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Disabled"
+            CanContentScroll="True">
+            <StackPanel
+            x:Name="PlaylistPanel"
             Orientation="Horizontal"
             CanHorizontallyScroll="True" 
-            Margin="10">
+            Margin="10"
+            Background="Beige">
 
-            <Button
-                Style="{StaticResource PlaylistStyle}">
-                <Grid Width="130" Height="130">
-                    <TextBlock
-                        Text="Вся музыка"
-                        FontSize="16"
-                        FontFamily="Candara"
-                        TextAlignment="Center" 
-                        Margin="10,114,10,0" 
-                        Foreground="Black"/>
-
-                    <Image
-                        Source="D:\Загрузки\playlist_icon.png" 
-                        Margin="10,5,10,20"/>
-
-                </Grid>
-
-            </Button>
-        </StackPanel>
+                <StackPanel.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Создать новый плейлист" Click="CreateNewPlaylist_Click"/>
+                    </ContextMenu>
+                </StackPanel.ContextMenu>
+            </StackPanel>
+        </ScrollViewer>
 
         <MediaElement 
             x:Name="MusicPlayer"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
             LoadedBehavior="Manual"
-            Source="C:\Users\ender\Music\Breaking Benjamin - Red Cold River.mp3"
+            MediaEnded="MusicPlayer_MediaEnded"
             Height="30" 
-            Width="30"/>
+            Width="30"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top" MediaOpened="MusicPlayer_MediaOpened"/>
 
         <ToggleButton
             x:Name="PlayButton"
@@ -78,7 +54,7 @@
             FontSize="32"
             Height="100"
             Width="100" 
-            Margin="769,37,0,55"
+            Margin="769,80,0,11"
             HorizontalAlignment="Left"
             VerticalAlignment="Center" 
             Click="PlayButton_Click"
@@ -93,7 +69,7 @@
             Width="100"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
-            Grid.Row="2" Margin="945,0,0,55" Click="NextButton_Click"/>
+            Grid.Row="2" Margin="945,0,0,12" Click="NextButton_Click"/>
 
         <ListBox 
             x:Name="CurrentPlaylist"
@@ -102,10 +78,12 @@
             VerticalAlignment="Top" 
             HorizontalAlignment="Left" 
             Height="459" 
-            Width="1564" 
-            Focusable="False"
-            SelectionChanged="CurrentPlaylist_SelectionChanged"
+            Width="1433" 
+            SelectionChanged="CurrentPlaylist_SelectionChanged" Grid.RowSpan="2"
             />
+
+        <Image Source="D:\Загрузки\advertisement.png" Margin="1448,10,10,10" Grid.Row="1"/>
+
         <Button
             x:Name="PreviousButton"     
             Style="{StaticResource ButtonStyle}"       
@@ -115,6 +93,27 @@
             Width="100"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
-            Grid.Row="2" Margin="588,0,0,55" Click="PreviousButton_Click"/>
+            Grid.Row="2" Margin="588,0,0,12" Click="PreviousButton_Click"/>
+
+        <Slider 
+            x:Name="TimeSlider"
+            
+            Margin="316,58,0,0" 
+            Grid.Row="2" 
+            VerticalAlignment="Top" 
+            HorizontalAlignment="Left" 
+            Height="16" 
+            Width="1000" 
+            Maximum="1" 
+            Delay="50"
+            Interval="10" 
+            IsSelectionRangeEnabled="True"
+            SelectionStart="0"
+            Thumb.DragCompleted="TimeSlider_DragCompleted"
+            ValueChanged="TimeSlider_ValueChanged" 
+            LargeChange="0" 
+            Cursor="Hand" 
+            IsTabStop="False" 
+            SmallChange="0.05"/>
     </Grid>
 </Window>
