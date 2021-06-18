@@ -27,7 +27,7 @@ namespace MediaPlayer
             });
         }
 
-        public static List<Playlist> DeserializePlaylists()
+        public static List<Playlist> DeserializeMusicPlaylists()
         {
             List<Playlist> Playlists = new List<Playlist>();
             Playlists.Add(new Playlist("Музыка"));
@@ -45,5 +45,26 @@ namespace MediaPlayer
                     Playlists.AddRange((List<Playlist>)formatter.Deserialize(fileStream));
             return Playlists;
         }
+        public static List<Playlist> DeserializeMediaPlaylists()
+        {
+            List<Playlist> Playlists = new List<Playlist>
+            {
+                new Playlist("Все медиафайлы")
+            };
+            string[] files = Directory.GetFiles(@"C:\Users\ender\Music\", "*.mp3|*.mp4");
+            if (files != null && files.Length != 0)
+                foreach (string s in files)
+                    Playlists[0].Medias.Add(new Media(s));
+            
+            string path = musicPath;
+            
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                if (fileStream.Length != 0)
+                    Playlists.AddRange((List<Playlist>)formatter.Deserialize(fileStream));
+            return Playlists;
+        }
+
     }
 }

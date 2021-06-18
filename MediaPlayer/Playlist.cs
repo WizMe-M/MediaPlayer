@@ -12,9 +12,11 @@ namespace MediaPlayer
     {
         public string Name { get; set; }
         public List<Music> Music { get; set; }
+        public List<Media> Medias { get; set; }
         Playlist()
         {
             Music = new List<Music>();
+            Medias = new List<Media>();
         }
         public Playlist(string Name) : this()
         {

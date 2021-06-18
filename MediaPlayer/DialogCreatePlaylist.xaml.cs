@@ -27,7 +27,7 @@ namespace MediaPlayer
         {
             InitializeComponent();
             p = new List<string>();
-            List<Playlist> playlists = Helper.DeserializePlaylists();
+            List<Playlist> playlists = Helper.DeserializeMusicPlaylists();
             foreach (Playlist pl in playlists)
                 p.Add(pl.Name);
         }
