@@ -491,22 +491,29 @@ namespace MediaPlayer
         private void SignOut_Click(object sender, RoutedEventArgs e)
         {
             Helper.SerializeAccountsAsync(loggedAccount);
-            Close();
             RegisterLoginWindow window = new RegisterLoginWindow();
             window.Show();
             window.Activate();
+            Close();
         }
         private void EditAccount_Click(object sender, RoutedEventArgs e)
         {
-
+            EditAccount editAccount = new EditAccount(loggedAccount);
+            if ((bool)editAccount.ShowDialog())
+            {
+                loggedAccount = editAccount.Editable;
+                UserIcon.ImageSource = new BitmapImage(new Uri(loggedAccount.IconUri));
+                UserLogin.Text = loggedAccount.Login;
+                UserPassword.Text = loggedAccount.Password;
+            }
         }
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             Helper.SerializeAccountsAsync(loggedAccount);
-            Close();
             DialogWindow window = new DialogWindow();
             window.Show();
             window.Activate();
+            Close();
         }
         #endregion
 

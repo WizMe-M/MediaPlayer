@@ -26,17 +26,18 @@ namespace MediaPlayer
 
         private void OpenCommonVersion_Click(object sender, RoutedEventArgs e)
         {
-            Close();
             CommonVersion window = new CommonVersion();
             window.Show();
             window.Activate();
+            Close();
         }
 
         private void OpenProVersion_Click(object sender, RoutedEventArgs e)
         {
-            Close();
             RegisterLoginWindow window = new RegisterLoginWindow();
             window.Show();
+            window.Activate();
+            Close();
         }
     }
 }

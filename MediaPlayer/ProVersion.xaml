@@ -226,16 +226,6 @@
                 <TextBlock x:Name="UserPassword" 
                     Background="White"
                     Margin="192,47,57,104"/>
-                
-                <Button 
-                    FontFamily="Leelawadee"
-                    FontSize="14"
-                    HorizontalContentAlignment="Center"
-                    Background="WhiteSmoke"
-                    Content="Сменить &#xD;&#xA;аватарку"
-                    Margin="5,126,229,10"
-                    Click="SignOut_Click"
-                    />
 
                 <Button 
                     FontFamily="Leelawadee"
@@ -243,7 +233,7 @@
                     HorizontalContentAlignment="Center"
                     Background="WhiteSmoke"
                     Content=" Изменить данные&#xD;&#xA;      об аккаунте"
-                    Margin="130,126,113,10"
+                    Margin="10,126,233,10"
                     Click="EditAccount_Click"
                     />
                 <Button 

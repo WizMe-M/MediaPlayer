@@ -50,6 +50,21 @@ namespace MediaPlayer
                 SerializeAccountsAsync(accounts);
             });
         }
+        public static async void SerializeAccountsAsync(Account account, int index)
+        {
+            await Task.Run(() =>
+            {
+                //добавляем или изменяем данные об аккаунте
+                List<Account> accounts = DeserializeAccount();
+                if (index != -1)
+                {
+                    accounts.RemoveAt(index);
+                    accounts.Insert(index, account);
+                }
+                else accounts.Add(account);
+                SerializeAccountsAsync(accounts);
+            });
+        }
         public static async void SerializeAccountsAsync(List<Account> accounts)
         {
             await Task.Run(() =>

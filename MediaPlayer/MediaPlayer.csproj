@@ -71,6 +71,9 @@
     <Compile Include="DialogAccounting.xaml.cs">
       <DependentUpon>DialogAccounting.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EditAccount.xaml.cs">
+      <DependentUpon>EditAccount.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Media.cs" />
     <Compile Include="ProVersion.xaml.cs">
       <DependentUpon>ProVersion.xaml</DependentUpon>
@@ -116,6 +119,10 @@
     <Compile Include="DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="EditAccount.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ProVersion.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
