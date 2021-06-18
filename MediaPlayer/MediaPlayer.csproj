@@ -68,11 +68,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DialogAccounting.xaml.cs">
+      <DependentUpon>DialogAccounting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Media.cs" />
     <Compile Include="ProVersion.xaml.cs">
       <DependentUpon>ProVersion.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RegisterLoginWindow.xaml.cs">
+      <DependentUpon>RegisterLoginWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="CommonVersion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DialogAccounting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -106,6 +117,10 @@
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="ProVersion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="RegisterLoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

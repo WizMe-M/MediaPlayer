@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,109 +23,174 @@ namespace MediaPlayer
     /// </summary>
     public partial class ProVersion : Window
     {
+        Account loggedAccount;
         bool LoopTrack;
         bool LoopPlaylist;
-        List<Playlist> Playlists;
         int playablePlaylist;
         int showingPlaylist;
-        int musicSelectedIndex;
-        public ProVersion()
+        int mediaSelectedIndex;
+        public ProVersion(Account account)
         {
             #region initialization
+
             InitializeComponent();
+            loggedAccount = account;
+
+            UserIcon.ImageSource = new BitmapImage(new Uri(loggedAccount.IconUri));
+            UserLogin.Text = loggedAccount.Login;
+            UserPassword.Text = loggedAccount.Password;
+
             playablePlaylist = 0;
             showingPlaylist = 0;
-            musicSelectedIndex = -1;
+            mediaSelectedIndex = -1;
             LoopPlaylist = false;
             LoopTrack = false;
-            Playlists = Helper.DeserializeMediaPlaylists();
             #endregion
 
-            foreach (Playlist p in Playlists)
+            foreach (Playlist p in loggedAccount.Playlists)
                 AddPlaylist(p.Name);
 
-            foreach (Media m in Playlists[0].Medias)
+            foreach (Media m in loggedAccount.Playlists[0].Medias)
                 AddMediaToPlaylist(m);
-
-
         }
+
+        #region Context menu functions
+        private void CreateNewPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            DialogCreatePlaylist dialogWindow = new DialogCreatePlaylist();
+            if ((bool)dialogWindow.ShowDialog())
+            {
+                string name = dialogWindow.PlaylistName;
+                AddPlaylist(name);
+                loggedAccount.Playlists.Add(new Playlist(name));
+                Helper.SerializeAccountsAsync(loggedAccount);
+            }
+        }
+        private void AddMediaToPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            if (loggedAccount.Playlists.Count != 0)
+            {
+                OpenFileDialog fileDialog = new OpenFileDialog
+                {
+                    Filter = "MP3 files (*.mp3)|*.mp3|MP4 files (*.mp3)|*.mp4"
+                };
+                if ((bool)fileDialog.ShowDialog())
+                {
+                    Media music = new Media(fileDialog.FileName);
+                    loggedAccount.Playlists[showingPlaylist].Medias.Add(music);
+                    AddMediaToPlaylist(music);
+                    Helper.SerializeAccountsAsync(loggedAccount);
+                }
+            }
+        }
+        private void RefreshPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            loggedAccount.Playlists[0].Medias.Clear();
+            string[] files = Directory.GetFiles(Helper.path);
+            if (files.Length != 0)
+                foreach (string s in files)
+                    if (Path.GetExtension(s) == ".mp3" || Path.GetExtension(s) == ".mp4")
+                        loggedAccount.Playlists[0].Medias.Add(new Media(s));
+            Helper.SerializeAccountsAsync(loggedAccount);
+            FillCurrentPlaylist(0);
+            MediaPlayer.Stop();
+            MediaPlayer.Source = null;
+            showingPlaylist = 0;
+            playablePlaylist = 0;
+            mediaSelectedIndex = -1;
+        }
+        #endregion
 
 
         #region Mediaplayer's buttons
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (musicSelectedIndex != -1)
+            if (mediaSelectedIndex != -1)
             {
                 if ((bool)PlayButton.IsChecked)
+                {
+                    PlayButton.Content = "&#xE768;";
                     MediaPlayer.Play();
-                else MediaPlayer.Pause();
+                }
+                else
+                {
+                    PlayButton.Content = "&#xE769;";
+                    MediaPlayer.Pause();
+                }
             }
         }
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (musicSelectedIndex != -1 && Playlists[playablePlaylist].Medias.Count != 0)
+            //проверяем, чтобы музыка была передана в медиаплеер
+            if (MediaPlayer.Source != null)
+                NextMusic();
+        }
+        void NextMusic()
+        {
+
+            mediaSelectedIndex++;
+            if (LoopPlaylist)
             {
-                musicSelectedIndex++;
-                if (LoopPlaylist)
+                if (mediaSelectedIndex == loggedAccount.Playlists[playablePlaylist].Medias.Count)
+                    mediaSelectedIndex = 0;
+                MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
+                MediaPlayer.Play();
+                PlayButton.IsChecked = true;
+            }
+            else
+            {
+                if (mediaSelectedIndex == loggedAccount.Playlists[playablePlaylist].Medias.Count)
                 {
-                    if (musicSelectedIndex == Playlists[playablePlaylist].Medias.Count)
-                        musicSelectedIndex = 0;
-                    MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[musicSelectedIndex].Path);
-                    MediaPlayer.Play();
-                    PlayButton.IsChecked = true;
+                    mediaSelectedIndex--;
+                    MediaPlayer.Stop();
+                    PlayButton.IsChecked = false;
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
                 }
                 else
                 {
-                    if (musicSelectedIndex == Playlists[playablePlaylist].Medias.Count)
-                    {
-                        musicSelectedIndex--;
-                        MediaPlayer.Stop();
-                        PlayButton.IsChecked = false;
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[musicSelectedIndex].Path);
-                        MessageBox.Show("Плейлист подошел к концу!");
-                    }
-                    else
-                    {
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[musicSelectedIndex].Path);
-                        MediaPlayer.Play();
-                        PlayButton.IsChecked = true;
-                    }
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
+                    MediaPlayer.Play();
+                    PlayButton.IsChecked = true;
                 }
             }
+
         }
         private void PreviousButton_Click(object sender, RoutedEventArgs e)
         {
-            if (musicSelectedIndex != -1 && Playlists[playablePlaylist].Medias.Count != 0)
+            //проверяем, чтобы музыка была передана в медиаплеер
+            if (MediaPlayer.Source != null)
+                PreviousMusic();
+        }
+        void PreviousMusic()
+        {
+
+            mediaSelectedIndex--;
+            if (LoopPlaylist)
             {
-                musicSelectedIndex--;
-                if (LoopPlaylist)
+                if (mediaSelectedIndex == -1)
+                    mediaSelectedIndex = loggedAccount.Playlists[playablePlaylist].Medias.Count - 1;
+                MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
+                MediaPlayer.Play();
+                PlayButton.IsChecked = true;
+            }
+            else
+            {
+                if (mediaSelectedIndex == -1)
                 {
-                    if (musicSelectedIndex == -1)
-                        musicSelectedIndex = Playlists[playablePlaylist].Medias.Count - 1;
-                    MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[musicSelectedIndex].Path);
-                    MediaPlayer.Play();
-                    PlayButton.IsChecked = true;
+                    mediaSelectedIndex++;
+                    MediaPlayer.Stop();
+                    PlayButton.IsChecked = false;
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[0].Path);
                 }
                 else
                 {
-                    if (musicSelectedIndex == -1)
-                    {
-                        musicSelectedIndex++;
-                        MediaPlayer.Stop();
-                        PlayButton.IsChecked = false;
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[0].Path);
-                        MessageBox.Show("Плейлист дошел до самого начала!");
-                    }
-                    else
-                    {
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[musicSelectedIndex].Path);
-                        MediaPlayer.Play();
-                        PlayButton.IsChecked = true;
-                    }
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
+                    MediaPlayer.Play();
+                    PlayButton.IsChecked = true;
                 }
+
             }
         }
-
         private void LoopTrack_Click(object sender, RoutedEventArgs e)
         {
             LoopTrack = !LoopTrack;
@@ -137,66 +203,24 @@ namespace MediaPlayer
             LoopTrack = false;
             LoopTrackBut.IsChecked = false;
         }
-        #endregion
-
-        #region Playlist Buttons' functions
-        void AddPlaylist(string playlistName)
+        private void PlusTenSecButton_Click(object sender, RoutedEventArgs e)
         {
-            var buttonGrid = new Grid()
+            if (MediaPlayer.Source != null)
             {
-                Style = Application.Current.Resources["InButtonGrid"] as Style
-            };
-            var namePlaylist = new TextBlock()
-            {
-                Text = playlistName,
-                Margin = new Thickness(10, 110, 10, 0)
-            };
-            var image = new Image()
-            {
-                Source = new BitmapImage(new Uri(@"D:\Загрузки\playlist_icon.png")),
-                Margin = new Thickness(10, 5, 10, 20)
-            };
-            buttonGrid.Children.Add(namePlaylist);
-            buttonGrid.Children.Add(image);
-            var playlistButton = new Button()
-            {
-                Style = Application.Current.Resources["PlaylistStyle"] as Style,
-                Content = buttonGrid
-            };
-            playlistButton.Click += PlaylistButton_Click;
-            playlistButton.MouseRightButtonUp += PlaylistButton_MouseRightButtonUp;
-            PlaylistPanel.Children.Add(playlistButton);
-        }
-        private void PlaylistButton_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (PlaylistPanel.Children[0] != sender)
-            {
-                var panel = (sender as Button).Content as Grid;
-
-                int deleteIndex = Playlists.FindIndex(p => p.Name == (panel.Children[0] as TextBlock).Text);
-                PlaylistPanel.Children.RemoveAt(deleteIndex);
-                Playlists.RemoveAt(deleteIndex);
-
-                if (deleteIndex == playablePlaylist)
-                {
-                    showingPlaylist = 0;
-                    playablePlaylist = 0;
-                    musicSelectedIndex = 0;
-                    MediaPlayer.Stop();
-                    MediaPlayer.Source = null;
-                    PlayButton.IsChecked = false;
-                }
-
-                if (deleteIndex <= showingPlaylist)
-                    showingPlaylist--;
-                if (deleteIndex < playablePlaylist)
-                    playablePlaylist--;
-
-                FillCurrentPlaylist(playablePlaylist);
+                TimeSpan time = TimeSpan.FromSeconds(10);
+                if (TotalTime - MediaPlayer.Position >= time)
+                    MediaPlayer.Position += time;
+                else NextMusic();
             }
-            else
+        }
+        private void MinusTenSecButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MediaPlayer.Source != null)
             {
-                MessageBox.Show("Нельзя удалить главный плейлист со всей музыкой");
+                TimeSpan time = TimeSpan.FromSeconds(10);
+                if (MediaPlayer.Position >= time)
+                    MediaPlayer.Position -= time;
+                else PreviousMusic();
             }
         }
 
@@ -235,7 +259,7 @@ namespace MediaPlayer
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Uid = media.Path
             };
-            deleteButton.Click += DeleteSongFromPlaylist_Click;
+            deleteButton.Click += DeleteMediaFromPlaylist_Click;
             panel.Children.Add(deleteButton);
 
             CurrentPlaylist.Items.Add(panel);
@@ -243,7 +267,7 @@ namespace MediaPlayer
         void FillCurrentPlaylist(int i)
         {
             CurrentPlaylist.Items.Clear();
-            foreach (Media media in Playlists[i].Medias)
+            foreach (Media media in loggedAccount.Playlists[i].Medias)
                 AddMediaToPlaylist(media);
             showingPlaylist = i;
         }
@@ -253,7 +277,7 @@ namespace MediaPlayer
             if ((sender as ListBox).SelectedItem != null)
             {
                 index = (sender as ListBox).SelectedIndex;
-                if (index == musicSelectedIndex && showingPlaylist == playablePlaylist)
+                if (index == mediaSelectedIndex && showingPlaylist == playablePlaylist)
                 {
                     if ((bool)PlayButton.IsChecked)
                         MediaPlayer.Pause();
@@ -263,10 +287,10 @@ namespace MediaPlayer
                 else
                 {
                     playablePlaylist = showingPlaylist;
-                    MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Medias[index].Path);
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[index].Path);
                     MediaPlayer.Play();
                     PlayButton.IsChecked = true;
-                    musicSelectedIndex = index;
+                    mediaSelectedIndex = index;
                 }
 
                 //снимает выделение после нажатия (вообще неплохо было бы просто убрать это самое выделение,
@@ -274,24 +298,96 @@ namespace MediaPlayer
                 (sender as ListBox).SelectedItem = null;
             }
         }
-        private void CreateNewPlaylist_Click(object sender, RoutedEventArgs e)
+        private void DeleteMediaFromPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            DialogCreatePlaylist dialogWindow = new DialogCreatePlaylist();
-            if ((bool)dialogWindow.ShowDialog())
+            int index = loggedAccount.Playlists[showingPlaylist].Medias.FindIndex(m => m.Path == (sender as Button).Uid);
+            loggedAccount.Playlists[showingPlaylist].Medias.RemoveAt(index);
+            CurrentPlaylist.Items.RemoveAt(index);
+            if (index == mediaSelectedIndex && showingPlaylist == playablePlaylist)
             {
-                string name = dialogWindow.PlaylistName;
-                AddPlaylist(name);
-                Playlists.Add(new Playlist(name));
-                Helper.SerializePlaylistsAsync(Playlists);
+                MediaPlayer.Stop();
+                PlayButton.IsChecked = false;
+                if (loggedAccount.Playlists[showingPlaylist].Medias.Count == 0)
+                {
+                    mediaSelectedIndex = -1;
+                    MediaPlayer.Source = null;
+                }
+                else
+                {
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[showingPlaylist].Medias[mediaSelectedIndex].Path);
+                }
             }
+            Helper.SerializeAccountsAsync(loggedAccount);
+            MessageBox.Show("Песня была удалена из плейлиста");
+        }
+        void AddPlaylist(string playlistName)
+        {
+            var buttonGrid = new Grid()
+            {
+                Style = Application.Current.Resources["InButtonGrid"] as Style
+            };
+            var namePlaylist = new TextBlock()
+            {
+                Text = playlistName,
+                Margin = new Thickness(10, 110, 10, 0)
+            };
+            var image = new Image()
+            {
+                Source = new BitmapImage(new Uri(@"D:\Загрузки\playlist_icon.png")),
+                Margin = new Thickness(10, 5, 10, 20)
+            };
+            buttonGrid.Children.Add(namePlaylist);
+            buttonGrid.Children.Add(image);
+            var playlistButton = new Button()
+            {
+                Style = Application.Current.Resources["PlaylistStyle"] as Style,
+                Content = buttonGrid
+            };
+            playlistButton.Click += PlaylistButton_Click;
+            playlistButton.MouseRightButtonUp += PlaylistButton_MouseRightButtonUp;
+            PlaylistPanel.Children.Add(playlistButton);
         }
         private void PlaylistButton_Click(object sender, RoutedEventArgs eventArgs)
         {
             var grid = (sender as Button).Content as Grid;
             var name = (grid.Children[0] as TextBlock).Text;
-            int index = Playlists.FindIndex(p => p.Name == name);
+            int index = loggedAccount.Playlists.FindIndex(p => p.Name == name);
             if (index != showingPlaylist)
                 FillCurrentPlaylist(index);
+        }
+        private void PlaylistButton_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (PlaylistPanel.Children[0] != sender)
+            {
+                var panel = (sender as Button).Content as Grid;
+
+                int deleteIndex = loggedAccount.Playlists.FindIndex(p => p.Name == (panel.Children[0] as TextBlock).Text);
+                PlaylistPanel.Children.RemoveAt(deleteIndex);
+                loggedAccount.Playlists.RemoveAt(deleteIndex);
+
+                if (deleteIndex == playablePlaylist)
+                {
+                    showingPlaylist = 0;
+                    playablePlaylist = 0;
+                    mediaSelectedIndex = 0;
+                    MediaPlayer.Stop();
+                    MediaPlayer.Source = null;
+                    PlayButton.IsChecked = false;
+                }
+
+                if (deleteIndex <= showingPlaylist)
+                    showingPlaylist--;
+                if (deleteIndex < playablePlaylist)
+                    playablePlaylist--;
+
+                FillCurrentPlaylist(playablePlaylist);
+
+                Helper.SerializeAccountsAsync(loggedAccount);
+            }
+            else
+            {
+                MessageBox.Show("Нельзя удалить главный плейлист со всей музыкой");
+            }
         }
         #endregion
 
@@ -300,28 +396,28 @@ namespace MediaPlayer
         {
             if (!LoopTrack)
             {
-                musicSelectedIndex++;
+                mediaSelectedIndex++;
                 if (LoopPlaylist)
                 {
-                    if (musicSelectedIndex == Playlists[playablePlaylist].Media.Count)
-                        musicSelectedIndex = 0;
-                    MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Media[musicSelectedIndex].Path);
+                    if (mediaSelectedIndex == loggedAccount.Playlists[playablePlaylist].Medias.Count)
+                        mediaSelectedIndex = 0;
+                    MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
                     MediaPlayer.Play();
                     PlayButton.IsChecked = true;
                 }
                 else
                 {
-                    if (musicSelectedIndex == Playlists[playablePlaylist].Media.Count)
+                    if (mediaSelectedIndex == loggedAccount.Playlists[playablePlaylist].Medias.Count)
                     {
-                        musicSelectedIndex--;
+                        mediaSelectedIndex--;
                         MediaPlayer.Stop();
                         PlayButton.IsChecked = false;
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Media[musicSelectedIndex].Path);
+                        MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
                         MessageBox.Show("Плейлист подошел к концу!");
                     }
                     else
                     {
-                        MediaPlayer.Source = new Uri(Playlists[playablePlaylist].Media[musicSelectedIndex].Path);
+                        MediaPlayer.Source = new Uri(loggedAccount.Playlists[playablePlaylist].Medias[mediaSelectedIndex].Path);
                         MediaPlayer.Play();
                         PlayButton.IsChecked = true;
                     }
@@ -335,13 +431,12 @@ namespace MediaPlayer
         }
         #endregion
 
-        #region MediaPlayer's Media Slider
-
+        #region MediaPlayer's Sliders
+        bool isDragging = false;
         TimeSpan TotalTime;
         private void MediaPlayer_MediaOpened(object sender, RoutedEventArgs e)
         {
             TotalTime = MediaPlayer.NaturalDuration.TimeSpan;
-
             // Create a timer that will update the counters and the time slider
             var timerVideoTime = new DispatcherTimer();
             timerVideoTime.Interval = TimeSpan.FromSeconds(0.01);
@@ -350,19 +445,24 @@ namespace MediaPlayer
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            // Check if the movie finished calculate it's total time
             if (MediaPlayer.NaturalDuration.HasTimeSpan)
             {
                 if (TotalTime.TotalSeconds > 0)
                 {
-                    // Updating time slider
-                    TimeSlider.Value = MediaPlayer.Position.TotalSeconds /
-                                       TotalTime.TotalSeconds;
+                    if (!isDragging)
+                    TimeSlider.Value = MediaPlayer.Position.TotalSeconds / TotalTime.TotalSeconds;
                 }
             }
         }
-        private void TimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ((Slider)sender).SelectionEnd = e.NewValue;
-
+        private void TimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            ((Slider)sender).SelectionEnd = e.NewValue;
+            MediaDuration.Text = $"{MediaPlayer.Position.StripMilliseconds()} / {TotalTime.StripMilliseconds()}";
+        }
+        private void TimeSlider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        {
+            isDragging = true;
+        }
         private void TimeSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             if (MediaPlayer.Source != null)
@@ -372,57 +472,43 @@ namespace MediaPlayer
                     MediaPlayer.Position = TimeSpan.FromSeconds((double)TimeSlider.Value * TotalTime.TotalSeconds);
                 }
             }
+            isDragging = false;
         }
 
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double volume = 100 * Math.Round((sender as Slider).Value, 2);
+            if (Volume != null)
+                Volume.Content = volume.ToString();
+        }
         #endregion
 
-        private void AddSongToPlaylist_Click(object sender, RoutedEventArgs e)
-        {
-            if (Playlists.Count != 0)
-            {
-                OpenFileDialog fileDialog = new OpenFileDialog
-                {
-                    Filter = "MP3 files (*.mp3)|*.mp3"
-                };
-                if ((bool)fileDialog.ShowDialog())
-                {
-                    Media music = new Media(fileDialog.FileName);
-                    Playlists[showingPlaylist].Media.Add(music);
-                    AddMediaToPlaylist(music);
-                    Helper.SerializePlaylistsAsync(Playlists);
-                }
-            }
-        }
-        private void DeleteSongFromPlaylist_Click(object sender, RoutedEventArgs e)
-        {
-            int index = Playlists[showingPlaylist].Media.FindIndex(m => m.Path == (sender as Button).Uid);
-            Playlists[showingPlaylist].Media.RemoveAt(index);
-            CurrentPlaylist.Items.RemoveAt(index);
-            if (index == musicSelectedIndex && showingPlaylist == playablePlaylist)
-            {
-                MediaPlayer.Stop();
-                PlayButton.IsChecked = false;
-                if (Playlists[showingPlaylist].Media.Count == 0)
-                {
-                    musicSelectedIndex = -1;
-                    MediaPlayer.Source = null;
-                }
-                else
-                {
-                    MediaPlayer.Source = new Uri(Playlists[showingPlaylist].Media[musicSelectedIndex].Path);
-                }
-            }
-            Helper.SerializePlaylistsAsync(Playlists);
-            MessageBox.Show("Песня была удалена из плейлиста");
-        }
 
-        private void RefreshPlaylist_Click(object sender, RoutedEventArgs e)
+
+
+
+        #region Account's buttons
+        private void SignOut_Click(object sender, RoutedEventArgs e)
         {
-            Playlists[0].Media.Clear();
-            string[] files = Directory.GetFiles(@"C:\Users\ender\Media\", "*.mp3");
-            if (files != null && files.Length != 0)
-                foreach (string s in files)
-                    Playlists[0].Media.Add(new Media(s));
+            Helper.SerializeAccountsAsync(loggedAccount);
+            Close();
+            RegisterLoginWindow window = new RegisterLoginWindow();
+            window.Show();
+            window.Activate();
         }
+        private void EditAccount_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Helper.SerializeAccountsAsync(loggedAccount);
+            Close();
+            DialogWindow window = new DialogWindow();
+            window.Show();
+            window.Activate();
+        }
+        #endregion
+
     }
 }

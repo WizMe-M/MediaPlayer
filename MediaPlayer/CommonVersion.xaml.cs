@@ -190,6 +190,7 @@ namespace MediaPlayer
                     playablePlaylist--;
 
                 FillCurrentPlaylist(playablePlaylist);
+                Helper.SerializePlaylistsAsync(Playlists);
             }
             else
             {

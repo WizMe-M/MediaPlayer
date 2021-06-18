@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 namespace MediaPlayer
 {
     [Serializable]
-    class Music
+    public class Music
     {
         public string Path { get; set; }
         Music()

@@ -1,0 +1,24 @@
+﻿<Window x:Class="MediaPlayer.RegisterLoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MediaPlayer"
+        mc:Ignorable="d"
+        Title="Аккаунты" Height="350" Width="350">
+
+    <Grid Background="Azure" >
+        <Button
+            Content="Зарегистрировать новый аккаунт" 
+            Margin="46,56,0,0" 
+            Style="{StaticResource DialogButtons}"
+            Background="DarkKhaki" 
+            Click="Register_Click" Height="80"/>
+        <Button 
+            Content="Войти в существующий аккаунт" 
+            Margin="46,188,0,0" 
+            Style="{StaticResource DialogButtons}"
+            Background="Gold" Click="Login_Click" Height="80"/>
+
+    </Grid>
+</Window>

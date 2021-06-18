@@ -21,7 +21,7 @@
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Создать новый плейлист" Click="CreateNewPlaylist_Click"/>
-                <MenuItem Header="Добавить песню" Click="AddSongToPlaylist_Click"/>
+                <MenuItem Header="Добавить медиа" Click="AddMediaToPlaylist_Click"/>
                 <MenuItem Header="Обновить главный плейлист" Click="RefreshPlaylist_Click"/>
             </ContextMenu>
         </Grid.ContextMenu>
@@ -39,14 +39,6 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Button 
-            x:Name="AddSongToPlaylist"
-            Style="{StaticResource ButtonStyle}"
-            Margin="425,86,1059,12" 
-            Grid.Row="2"
-            Content="Add media"
-            Click="AddSongToPlaylist_Click"/>
-
         <MediaElement 
             x:Name="MediaPlayer"
             LoadedBehavior="Manual"
@@ -57,17 +49,18 @@
             VerticalAlignment="Top" 
             MediaOpened="MediaPlayer_MediaOpened"             
             Margin="1138,10,0,0" 
-            Grid.Row="1"/>
+            Grid.Row="1"
+            />
 
         <ToggleButton
             x:Name="PlayButton"
             Style="{StaticResource ToggleButtonStyle}"
             IsThreeState="False"
-            Content="Play"
+            Content="&#xE768;"
             FontSize="32"
             Height="100"
             Width="100" 
-            Margin="769,80,0,11"
+            Margin="493,86,0,12"
             HorizontalAlignment="Left"
             VerticalAlignment="Center" 
             Click="PlayButton_Click"
@@ -77,9 +70,9 @@
             x:Name="LoopTrackBut"
             Style="{StaticResource ToggleButtonStyle}"
             IsThreeState="False"
-            Content="Loop track"
+            Content="&#xE7A6;"
             Grid.Row="2" 
-            Margin="10,141,1474,12"
+            Margin="58,141,1426,12"
             Click="LoopTrack_Click"
             />
 
@@ -87,24 +80,12 @@
             x:Name="LoopPlaylistBut"
             Style="{StaticResource ToggleButtonStyle}"
             IsThreeState="False"
-            Content="Loop playlist"
+            Content="&#xE777;"
             Grid.Row="2" 
-            Margin="10,86,1474,67"
+            Margin="58,86,1426,67"
             Click="LoopPlaylist_Click"
             />
 
-        <Button
-            x:Name="NextButton"
-            Style="{StaticResource ButtonStyle}"
-            Content="Next"
-            FontSize="32"
-            Height="100"
-            Width="100"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom"
-            Grid.Row="2" 
-            Margin="945,0,0,12" 
-            Click="NextButton_Click"/>
 
         <ListBox 
             x:Name="CurrentPlaylist"
@@ -117,32 +98,45 @@
             Width="1123">
         </ListBox>
 
-
         <Button
-            x:Name="PreviousButton"     
-            Style="{StaticResource ButtonStyle}"       
-            Content="Previous"
+            x:Name="NextButton"
+            Style="{StaticResource ButtonStyle}"
+            Content="&#xE72A;"
             FontSize="32"
             Height="100"
             Width="100"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
-            Grid.Row="2" Margin="588,0,0,12" Click="PreviousButton_Click"/>
+            Grid.Row="2" 
+            Margin="786,0,0,12" 
+            Click="NextButton_Click"/>
+
+        <Button
+            x:Name="PreviousButton"     
+            Style="{StaticResource ButtonStyle}"       
+            Content="&#xE72B;"
+            FontSize="32"
+            Height="100"
+            Width="100"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Grid.Row="2" Margin="189,0,0,12" Click="PreviousButton_Click"/>
 
         <Slider 
             x:Name="TimeSlider"            
-            Margin="513,37,0,0" 
+            Margin="189,49,0,0" 
             Grid.Row="2" 
             VerticalAlignment="Top" 
             HorizontalAlignment="Left" 
-            Height="16" 
-            Width="620" 
+            Height="21" 
+            Width="697" 
             Maximum="1" 
             Delay="50"
             Interval="10" 
             IsSelectionRangeEnabled="True"
             SelectionStart="0"
             Thumb.DragCompleted="TimeSlider_DragCompleted"
+            Thumb.DragStarted="TimeSlider_DragStarted"
             ValueChanged="TimeSlider_ValueChanged" 
             LargeChange="0" 
             Cursor="Hand" 
@@ -154,11 +148,122 @@
             Grid.Row="2" 
             VerticalAlignment="Top" 
             HorizontalAlignment="Left" 
-            Margin="1364,38,0,0"
+            Margin="909,86,0,0"
             Orientation="Vertical"
-            Height="150"
+            Height="100"
             Value="{Binding ElementName=MediaPlayer, Path=Volume, Mode=TwoWay}" 
             Minimum="0"
-            Maximum="1"/>
+            Maximum="1" 
+            LargeChange="0" 
+            TickFrequency="0.1" 
+            TickPlacement="BottomRight" 
+            Cursor="Hand" 
+            IsSnapToTickEnabled="True" ValueChanged="VolumeSlider_ValueChanged"/>
+
+        <Label 
+            Content="Громкость:"
+            Grid.Row="2"
+            Margin="938,123,568,45"/>
+
+        <Label 
+            x:Name="Volume"
+            Content="50"
+            Grid.Row="2"
+            Margin="1016,123,533,45"/>
+
+        <Button
+            x:Name="PlusTenSecButton"
+            Style="{StaticResource ButtonStyle}"
+            FontFamily="Leelawadee"
+            Content="+10с"
+            FontSize="32"
+            Height="100"
+            Width="100"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Grid.Row="2" 
+            Margin="643,0,0,12" 
+            Click="PlusTenSecButton_Click"/>
+
+        <Button
+            x:Name="MinusTenSecButton"     
+            Style="{StaticResource ButtonStyle}"  
+            FontFamily="Leelawadee"
+            Content="-10с"
+            FontSize="32"
+            Height="100"
+            Width="100"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Grid.Row="2" 
+            Margin="341,0,0,12" 
+            Click="MinusTenSecButton_Click"/>
+
+
+        <Border
+            Background="BlanchedAlmond"
+            Grid.Row="2" 
+            Margin="1225,10,10,12">
+            <Grid>
+                <Ellipse
+                    Width="100" 
+                    Height="100" 
+                    Margin="10,10,239,66" 
+                    Stroke="Black">
+                    <Ellipse.Fill>
+                        <ImageBrush x:Name="UserIcon" ImageSource="file:///D:/Загрузки/basic_icon.svg.png" Stretch="UniformToFill"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <Label Content="Логин:"
+                       Margin="130,10,162,141"/>
+                <TextBlock x:Name="UserLogin" 
+                    Background="White"
+                    Margin="192,10,57,141"/>
+
+                <Label Content="Пароль:" 
+                       Margin="130,47,162,104"/>
+                <TextBlock x:Name="UserPassword" 
+                    Background="White"
+                    Margin="192,47,57,104"/>
+                
+                <Button 
+                    FontFamily="Leelawadee"
+                    FontSize="14"
+                    HorizontalContentAlignment="Center"
+                    Background="WhiteSmoke"
+                    Content="Сменить &#xD;&#xA;аватарку"
+                    Margin="5,126,229,10"
+                    Click="SignOut_Click"
+                    />
+
+                <Button 
+                    FontFamily="Leelawadee"
+                    FontSize="12"
+                    HorizontalContentAlignment="Center"
+                    Background="WhiteSmoke"
+                    Content=" Изменить данные&#xD;&#xA;      об аккаунте"
+                    Margin="130,126,113,10"
+                    Click="EditAccount_Click"
+                    />
+                <Button 
+                    FontFamily="Leelawadee"
+                    FontSize="14"
+                    HorizontalContentAlignment="Center"
+                    Background="WhiteSmoke"
+                    Content="   Выйти из&#xD;&#xA; приложения"
+                    Margin="241,126,10,10"
+                    Click="Exit_Click"
+                    />
+
+            </Grid>
+        </Border>
+
+        <TextBlock
+            x:Name="MediaDuration"
+            Text="00:00:00 / 00:00:00"
+            
+            Grid.Row="2"
+            Margin="493,14,991,154"/>
     </Grid>
 </Window>

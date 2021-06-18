@@ -8,7 +8,8 @@ using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
 {
-    class Media
+    [Serializable]
+    public class Media
     {
         public string Path { get; set; }
         Media()
