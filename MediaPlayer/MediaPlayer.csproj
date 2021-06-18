@@ -41,6 +41,7 @@
     <Reference Include="JetBrains.Annotations, Version=2018.3.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.2018.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MP3Sharp, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MP3Sharp.1.0.5\lib\netstandard2.0\MP3Sharp.dll</HintPath>
     </Reference>
@@ -75,6 +76,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DialogFindMusic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -89,6 +94,9 @@
     </Compile>
     <Compile Include="DialogCreatePlaylist.xaml.cs">
       <DependentUpon>DialogCreatePlaylist.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DialogFindMusic.xaml.cs">
+      <DependentUpon>DialogFindMusic.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>

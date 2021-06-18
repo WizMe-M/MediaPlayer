@@ -13,35 +13,17 @@ using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
 {
+    [Serializable]
     class Music
     {
         public string Path { get; set; }
-        public Image AlbumCover { get; set; }
-        public Id3Tag Tag { get; set; }
         Music()
         {
 
         }
         public Music(string Path)
         {
-            this.Path = Path;
-            var MP3 = new Mp3(Path);
-            Tag = MP3.GetTag(Id3TagFamily.Version2X);
-            var audio = new TagLib.Mpeg.AudioFile(Path);
-            AlbumCover = new Image
-            {
-                Source = new BitmapImage(new Uri(@"D:\Загрузки\music.jpg")),
-                Height = 65,
-                Width = 65
-            };
-            if (audio.Tag.Pictures.Length >= 1)
-            {
-                var bin = audio.Tag.Pictures[0].Data.Data;
-                var bmi = LoadImage(bin);
-
-                if (bmi != null)
-                    AlbumCover.Source = bmi;
-            }
+            this.Path = Path;   
         }
         private static BitmapImage LoadImage(byte[] imageData)
         {
@@ -59,6 +41,29 @@ namespace MediaPlayer
             }
             image.Freeze();
             return image;
+        }
+        public Image GetImage()
+        {
+            var audio = new TagLib.Mpeg.AudioFile(Path);
+            Image AlbumCover = new Image
+            {
+                Source = new BitmapImage(new Uri(@"D:\Загрузки\music.jpg")),
+                Height = 65,
+                Width = 65
+            };
+            if (audio.Tag.Pictures.Length >= 1)
+            {
+                var bin = audio.Tag.Pictures[0].Data.Data;
+                var bmi = LoadImage(bin);
+
+                if (bmi != null)
+                    AlbumCover.Source = bmi;
+            }
+            return AlbumCover;
+        }
+        public Id3Tag GetTag()
+        {
+            return new Mp3(Path).GetTag(Id3TagFamily.Version2X);
         }
     }
 }

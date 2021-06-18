@@ -7,6 +7,7 @@ using Id3.Frames;
 
 namespace MediaPlayer
 {
+    [Serializable]
     class Playlist
     {
         public string Name { get; set; }

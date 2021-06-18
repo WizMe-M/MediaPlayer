@@ -22,21 +22,21 @@ namespace MediaPlayer
     public partial class DialogCreatePlaylist : Window
     {
         public string PlaylistName { get; set; }
-        List<string> directories;
+        List<string> p;
         public DialogCreatePlaylist()
         {
             InitializeComponent();
-            directories = new List<string>();
-            string[] d = Directory.GetDirectories(Helper.musicPath);
-            foreach (string s in d)
-                directories.Add(System.IO.Path.GetDirectoryName(s));
+            p = new List<string>();
+            List<Playlist> playlists = Helper.DeserializePlaylists();
+            foreach (Playlist pl in playlists)
+                p.Add(pl.Name);
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
         {
             string playlistName = playlistNameTB.Text.Trim();
             string pattern = @"^[a-zA-Zа-яА-Я0-9 ]+$";
-            if (!Regex.IsMatch(playlistName, pattern) || directories.Contains(playlistName))
+            if (!Regex.IsMatch(playlistName, pattern) || p.Contains(playlistName))
             {
                 MessageBox.Show("В поле \"Название плейлиста\" введены некорректные данные " +
                     "или плейлист с таким именем уже существует!", "ОШИБКА!", MessageBoxButton.OK, MessageBoxImage.Error);
